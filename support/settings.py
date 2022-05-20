@@ -1,8 +1,12 @@
+import os
+from dotenv import load_dotenv
 
-from decouple import config
 from pathlib import Path
 from datetime import timedelta
 
+load_dotenv()
+env_path = Path('.')/'.env'
+load_dotenv(dotenv_path=env_path)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -12,7 +16,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = config('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -32,6 +36,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'api.apps.ApiConfig',
+    'userclient.apps.UserclientConfig'
 ]
 
 MIDDLEWARE = [
@@ -71,9 +76,9 @@ WSGI_APPLICATION = 'support.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('PSTGRES_NAME'),
-        'USER': config('PSTGRES_USER'),
-        'PASSWORD': config('PSTGRES_PASSWORD'),
+        'NAME': os.getenv('PSTGRES_NAME'),
+        'USER': os.getenv('PSTGRES_USER'),
+        'PASSWORD': os.getenv('PSTGRES_PASSWORD'),
         'HOST': 'localhost',
         'PORT': '',
     }
@@ -122,25 +127,27 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-EMAIL_HOST = 'smtp.mail.ru'
-EMAIL_PORT = 2525
-EMAIL_HOST_USER = "test_mail@mail.ru"
-EMAIL_HOST_PASSWORD = "password"
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
+EMAIL_HOST = os.getenv('EMAIL_HOST')
+EMAIL_PORT = os.getenv('EMAIL_PORT')
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS')
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL')
 
-REST_FRAMEWORK = {
-    'DEFAULT_RENDERER_CLASSES': [
-        'rest_framework.renderers.JSONRenderer',
-    ],
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
+# REST_FRAMEWORK = {
+#     'DEFAULT_RENDERER_CLASSES': [
+#         'rest_framework.renderers.JSONRenderer',
+#     ],
+#     'DEFAULT_PARSER_CLASSES': [
+#         'rest_framework.parsers.JSONParser',
+#     ],
+#     'DEFAULT_AUTHENTICATION_CLASSES': (
+#
+#         'rest_framework_simplejwt.authentication.JWTAuthentication',
+#         'rest_framework.authentication.TokenAuthentication',
+#
+#     )
+# }
 
 
 SIMPLE_JWT = {
@@ -174,3 +181,12 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
+
+REDIS_HOST = os.getenv('REDIS_HOST')
+REDIS_PORT = os.getenv('REDIS_PORT')
+CELERY_BROKER_URL = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_BROKER_TRANSPORT_OPTION = {'visibility_timeout': 3600}
+CELERY_RESULT_BACKEND = 'redis://' + REDIS_HOST + ':' + REDIS_PORT + '/0'
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'

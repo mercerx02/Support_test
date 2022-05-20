@@ -1,5 +1,5 @@
-from api.serializers import TicketSerializer
-from api.models import Ticket
+from api.serializers import TicketSerializer,MessageSerializer
+from api.models import Ticket,Message
 from django.test import TestCase
 
 class TicketSerializerTestCase(TestCase):
@@ -17,3 +17,4 @@ class TicketSerializerTestCase(TestCase):
         ]
 
         self.assertEqual(data,expected_data)
+
